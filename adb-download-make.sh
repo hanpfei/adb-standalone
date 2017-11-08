@@ -38,7 +38,7 @@ make
 cd ../adb/
 echo "\n>> Make... \n"
 make clean
-make
+make adb
 echo "\n>> Copying adb back into current dir...\n"
 cp adb ../../../../
 echo "\n>> FINISH!\n"
