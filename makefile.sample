@@ -33,8 +33,6 @@ libbase_cppflags := \
 
 CPPFLAGS := $(libbase_cppflags) \
     -I. \
-    -I../include \
-    -I../../../external/zlib \
     -I../base/include \
 
 LIBBASE_OBJS := $(LIBBASE_SRC:.cpp=.o)
@@ -76,6 +74,7 @@ LIBADB_SRC_FILES := \
     transport.cpp \
     transport_local.cpp \
     transport_usb.cpp \
+    diagnose_usb.cpp \
 
 LIBADB_CFLAGS := \
     $(ADB_COMMON_CFLAGS) \
@@ -97,7 +96,7 @@ CPPFLAGS := $(LOCAL_LIBADB_CFLAGS) \
 LIBADB_SRCS = \
     $(LIBADB_SRC_FILES) \
     $(LIBADB_linux_SRC_FILES) \
-    adb_auth_host.cpp \
+#    adb_auth_host.cpp \
 
 LIBADB_OBJS := $(LIBADB_SRCS:.cpp=.o)
 
@@ -141,14 +140,13 @@ CPPFLAGS+= \
     -D_Nonnull= \
     -D_Nullable= \
     -I. \
-    -I/usr/include/ \
-    -I../include \
-    -I../../../external/zlib \
+    -I/usr/local/include/ \
     -I../base/include \
+    -I../include \
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
-LDFLAGS := -L. -L/lib/aarch64-linux-gnu
+LDFLAGS := -L.
 
 all: adb
  
@@ -156,5 +154,4 @@ adb: $(ADB_OBJS) libadb
 	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog
  
 clean:
-	rm -rf $(ADB_OBJS) $(LIBADB_OBJS)
-
+	rm -rf $(ADB_OBJS) $(LIBADB_OBJS) $(LIBBASE_OBJS) adb libadb.a libbase.a liblog.a
