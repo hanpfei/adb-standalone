@@ -2,7 +2,7 @@
 # ------------
 
 #TODO change TOOLCHAIN variable to your toolchain path 
-TOOLCHAIN=/home/hanpfei0306/data/dev_tools/Android/android-ndk-r13b/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
+TOOLCHAIN=
 CC= $(TOOLCHAIN)gcc
 LD= $(TOOLCHAIN)gcc
 AR= $(TOOLCHAIN)ar
@@ -13,12 +13,11 @@ LOCAL_PATH:= $(pwd)
 adb_version := $(shell git -C $(LOCAL_PATH) rev-parse --short=12 HEAD 2>/dev/null)-android
 
 ADB_COMMON_CFLAGS := \
-    -Wall -Wextra -Werror \
+    -Wall -Wextra \
     -Wno-unused-parameter \
     -Wno-missing-field-initializers \
     -Wvla \
     -DADB_REVISION='"$(adb_version)"' \
-    -I/home/hanpfei0306/data/dev_tools/Android/android-ndk-r13b/platforms/android-24/arch-arm64/usr/include/
 
 ADB_COMMON_linux_CFLAGS := \
     -std=c++14 \
@@ -69,7 +68,7 @@ LIBADB_SRCS = \
 LIBADB_OBJS := $(LIBADB_SRCS:.cpp=.o)
 
 libadb: $(LIBADB_OBJS)
-	$(AR) -crv lib$@.a LIBADB_OBJS
+	$(AR) -crv $@.a $(LIBADB_OBJS)
 
 
 LOCAL_LDLIBS_linux := -lrt -ldl -lpthread
@@ -118,7 +117,7 @@ OBJS += $(SRCS:.cpp=.o)
  
 all: adb
  
-adb: $(OBJS)
+adb: $(OBJS) libadb
 	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
  
 clean:
