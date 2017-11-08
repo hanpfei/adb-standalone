@@ -155,4 +155,4 @@ adb: $(ADB_OBJS) libadb libbase
 	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog -lcrypto -lssl
  
 clean:
-	rm -rf $(ADB_OBJS) $(LIBADB_OBJS) $(LIBBASE_OBJS) adb libadb.a libbase.a liblog.a
+	rm -rf $(ADB_OBJS) $(LIBADB_OBJS) $(LIBBASE_OBJS) adb libadb.a libbase.a
