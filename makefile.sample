@@ -59,10 +59,12 @@ LIBADB_linux_SRC_FILES := \
 
 LOCAL_LIBADB_CFLAGS := $(LIBADB_CFLAGS) -DADB_HOST=1
 
-CPPFLAGS := $(LOCAL_LIBADB_CFLAGS)
+CPPFLAGS := $(LOCAL_LIBADB_CFLAGS) \
+    $(ADB_COMMON_linux_CFLAGS)
 
 LIBADB_SRCS = \
     $(LIBADB_SRC_FILES) \
+    $(LIBADB_linux_SRC_FILES) \
     adb_auth_host.cpp \
 
 LIBADB_OBJS := $(LIBADB_SRCS:.cpp=.o)
@@ -73,7 +75,7 @@ libadb: $(LIBADB_OBJS)
 
 LOCAL_LDLIBS_linux := -lrt -ldl -lpthread
 
-LOCAL_SRC_FILES += \
+LOCAL_ADB_SRC_FILES += \
     adb_client.cpp \
     bugreport.cpp \
     client/main.cpp \
@@ -84,10 +86,7 @@ LOCAL_SRC_FILES += \
     services.cpp \
     shell_service_protocol.cpp \
 
-SRCS = \
-    $(LOCAL_SRC_FILES) \
-
-LOCAL_CFLAGS += \
+LOCAL_ADB_CFLAGS := \
     $(ADB_COMMON_CFLAGS) \
     -D_GNU_SOURCE \
     -DADB_HOST=1 \
@@ -95,31 +94,31 @@ LOCAL_CFLAGS += \
 LOCAL_CFLAGS_linux := \
     $(ADB_COMMON_linux_CFLAGS) \
 
-CPPFLAGS+= $(LOCAL_CFLAGS)
+ADB_SRCS = \
+    $(LOCAL_ADB_SRC_FILES) \
+
+CPPFLAGS := $(LOCAL_ADB_CFLAGS) $(LOCAL_CFLAGS_linux)
+
 CPPFLAGS+= -DHAVE_FORKEXEC=1
 CPPFLAGS+= -DHAVE_SYMLINKS
 CPPFLAGS+= -DHAVE_TERMIO_H
 CPPFLAGS+= -DHAVE_SYS_SOCKET_H
-CPPFLAGS+= -D_GNU_SOURCE
 CPPFLAGS+= -D_XOPEN_SOURCE
-CPPFLAGS+= -std=c++11 
 CPPFLAGS+= -I.
 CPPFLAGS+= -I../include
 CPPFLAGS+= -I../../../external/zlib
 CPPFLAGS+= -I../../../external/openssl/include
 CPPFLAGS+= -I../base/include 
-CFLAGS+= -O2 -g -Wall -Wno-unused-parameter
 
-LIBS= $(LOCAL_LDLIBS_linux)
- 
-OBJS := $(SRCS:.c=.o)
-OBJS += $(SRCS:.cpp=.o)
- 
+ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
+
+LDFLAGS := -L.
+
 all: adb
  
 adb: $(OBJS) libadb
-	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb
  
 clean:
-	rm -rf $(OBJS)
+	rm -rf $(ADB_OBJS) $(LIBADB_OBJS)
 
