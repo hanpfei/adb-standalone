@@ -1,0 +1,53 @@
+TOOLCHAIN=
+CC= $(TOOLCHAIN)gcc
+LD= $(TOOLCHAIN)gcc
+AR= $(TOOLCHAIN)ar
+CXX=$(TOOLCHAIN)g++
+
+LOCAL_PATH:= $(shell pwd)
+
+LIBLOG_PATH := $(LOCAL_PATH)/../liblog
+
+LIBLOG_SRC_FILES := \
+    $(LIBLOG_PATH)/log_event_list.c \
+    $(LIBLOG_PATH)/log_event_write.c \
+    $(LIBLOG_PATH)/logger_write.c \
+    $(LIBLOG_PATH)/config_write.c \
+    $(LIBLOG_PATH)/logger_name.c \
+    $(LIBLOG_PATH)/logger_lock.c \
+    $(LIBLOG_PATH)/../libcutils/socket_local_client_unix.c \
+    $(LIBLOG_PATH)/../libcutils/socket_network_client_unix.c \
+    $(LIBLOG_PATH)/../libcutils/socket_local_server_unix.c \
+    $(LIBLOG_PATH)/../libcutils/socket_loopback_server_unix.c \
+    $(LIBLOG_PATH)/../libcutils/socket_inaddr_any_server_unix.c \
+    $(LIBLOG_PATH)/../libcutils/socket_loopback_client_unix.c \
+    $(LIBLOG_PATH)/../libcutils/load_file.c \
+    $(LIBLOG_PATH)/../libcutils/threads.c \
+
+LIBLOG_SRC_FILES += \
+    $(LIBLOG_PATH)/fake_log_device.c \
+    $(LIBLOG_PATH)/event.logtags \
+    $(LIBLOG_PATH)/fake_writer.c
+
+LOCAL_SRC_FILES_linux := event_tag_map.c
+
+LIBLOG_SRCS := $(LIBLOG_SRC_FILES) \
+    $(LOCAL_SRC_FILES_linux)
+
+liblog_cflags := -DLIBLOG_LOG_TAG=1005
+liblog_cflags += -DSNET_EVENT_LOG_TAG=1397638484
+
+CFLAGS := -DFAKE_LOG_DEVICE=1 -Werror -fvisibility=hidden $(liblog_cflags) \
+    -I. \
+    -I../include \
+    -I../../../external/zlib \
+    -I../../../external/openssl/include \
+    -I../base/include \
+
+LIBLOG_OBJS := $(LIBLOG_SRCS:.c=.o)
+
+liblog: $(LIBLOG_OBJS)
+	$(AR) -crv ../adb/$@.a $(LIBLOG_OBJS)
+
+clean:
+	rm -rf $(LIBLOG_OBJS) liblog.a

@@ -146,11 +146,11 @@ CPPFLAGS+= \
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
-LDFLAGS := -L.
+LDFLAGS := -L. 
 
 all: adb
  
-adb: $(ADB_OBJS) libadb
+adb: $(ADB_OBJS) libadb libbase
 	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog
  
 clean:
