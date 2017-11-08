@@ -8,7 +8,40 @@ LD= $(TOOLCHAIN)gcc
 AR= $(TOOLCHAIN)ar
 CXX=$(TOOLCHAIN)g++
 
-LOCAL_PATH:= $(pwd)
+LOCAL_PATH:= $(shell pwd)
+
+
+LIBBASE_PATH := $(LOCAL_PATH)/../base
+
+LIBBASE_SRC_FILES := \
+    $(LIBBASE_PATH)/file.cpp \
+    $(LIBBASE_PATH)/logging.cpp \
+    $(LIBBASE_PATH)/parsenetaddress.cpp \
+    $(LIBBASE_PATH)/stringprintf.cpp \
+    $(LIBBASE_PATH)/strings.cpp \
+    $(LIBBASE_PATH)/test_utils.cpp \
+
+libbase_linux_src_files := \
+    $(LIBBASE_PATH)/errors_unix.cpp \
+
+LIBBASE_SRC := $(LIBBASE_SRC_FILES) \
+    $(libbase_linux_src_files)
+
+libbase_cppflags := \
+    -Wall \
+    -Wextra \
+
+CPPFLAGS := $(libbase_cppflags) \
+    -I. \
+    -I../include \
+    -I../../../external/zlib \
+    -I../base/include \
+
+LIBBASE_OBJS := $(LIBBASE_SRC:.cpp=.o)
+
+libbase: $(LIBBASE_OBJS)
+	$(AR) -crv $@.a $(LIBBASE_OBJS)
+
 
 adb_version := $(shell git -C $(LOCAL_PATH) rev-parse --short=12 HEAD 2>/dev/null)-android
 
@@ -72,7 +105,7 @@ libadb: $(LIBADB_OBJS)
 	$(AR) -crv $@.a $(LIBADB_OBJS)
 
 
-LOCAL_LDLIBS_linux := -lrt -ldl -lpthread -lstdc++ -lcrypto
+LOCAL_LDLIBS_linux := -lrt -ldl -lpthread -lstdc++ -lcrypto -lssl
 
 
 LOCAL_ADB_SRC_FILES += \
@@ -108,19 +141,19 @@ CPPFLAGS+= \
     -D_Nonnull= \
     -D_Nullable= \
     -I. \
+    -I/usr/include/ \
     -I../include \
     -I../../../external/zlib \
-    -I../../../external/openssl/include \
     -I../base/include \
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
-LDFLAGS := -L.
+LDFLAGS := -L. -L/lib/aarch64-linux-gnu
 
 all: adb
  
 adb: $(ADB_OBJS) libadb
-	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb
+	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog
  
 clean:
 	rm -rf $(ADB_OBJS) $(LIBADB_OBJS)
