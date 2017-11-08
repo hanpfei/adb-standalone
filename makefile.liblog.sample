@@ -26,7 +26,6 @@ LIBLOG_SRC_FILES := \
 
 LIBLOG_SRC_FILES += \
     $(LIBLOG_PATH)/fake_log_device.c \
-    $(LIBLOG_PATH)/event.logtags \
     $(LIBLOG_PATH)/fake_writer.c
 
 LOCAL_SRC_FILES_linux := event_tag_map.c

@@ -96,7 +96,7 @@ CPPFLAGS := $(LOCAL_LIBADB_CFLAGS) \
 LIBADB_SRCS = \
     $(LIBADB_SRC_FILES) \
     $(LIBADB_linux_SRC_FILES) \
-#    adb_auth_host.cpp \
+    adb_auth_host.cpp \
 
 LIBADB_OBJS := $(LIBADB_SRCS:.cpp=.o)
 
@@ -104,7 +104,7 @@ libadb: $(LIBADB_OBJS)
 	$(AR) -crv $@.a $(LIBADB_OBJS)
 
 
-LOCAL_LDLIBS_linux := -lrt -ldl -lpthread -lstdc++ -lcrypto -lssl
+LOCAL_LDLIBS_linux := -lrt -ldl -lpthread -lstdc++
 
 
 LOCAL_ADB_SRC_FILES += \
@@ -143,15 +143,16 @@ CPPFLAGS+= \
     -I/usr/local/include/ \
     -I../base/include \
     -I../include \
+    -I/home/hzhanpengfei/Andrids/boringssl/include
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
-LDFLAGS := -L. 
+LDFLAGS := -L. -L/home/hzhanpengfei/Andrids/boringssl/build/crypto
 
 all: adb
  
 adb: $(ADB_OBJS) libadb libbase
-	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog
+	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog -lcrypto -lssl
  
 clean:
 	rm -rf $(ADB_OBJS) $(LIBADB_OBJS) $(LIBBASE_OBJS) adb libadb.a libbase.a liblog.a
