@@ -2,7 +2,7 @@
 # -------------------------
 
 # Branch to checkout from Android source code repo
-branch=android-4.4.4_r2.0.1
+branch=android-7.1.1_r22
 
 # Makefile to use (will be automatically copied into system/core/adb)
 makefile=makefile.sample
