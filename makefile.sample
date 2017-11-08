@@ -2,56 +2,101 @@
 # ------------
 
 #TODO change TOOLCHAIN variable to your toolchain path 
-TOOLCHAIN=
+TOOLCHAIN=/home/hanpfei0306/data/dev_tools/Android/android-ndk-r13b/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-
 CC= $(TOOLCHAIN)gcc
 LD= $(TOOLCHAIN)gcc
-CXX=$(CC)
+AR= $(TOOLCHAIN)ar
+CXX=$(TOOLCHAIN)g++
+
+LOCAL_PATH:= $(pwd)
+
+adb_version := $(shell git -C $(LOCAL_PATH) rev-parse --short=12 HEAD 2>/dev/null)-android
+
+ADB_COMMON_CFLAGS := \
+    -Wall -Wextra -Werror \
+    -Wno-unused-parameter \
+    -Wno-missing-field-initializers \
+    -Wvla \
+    -DADB_REVISION='"$(adb_version)"' \
+    -I/home/hanpfei0306/data/dev_tools/Android/android-ndk-r13b/platforms/android-24/arch-arm64/usr/include/
+
+ADB_COMMON_linux_CFLAGS := \
+    -std=c++14 \
+    -Wexit-time-destructors \
+
+# libadb
+# =========================================================
+
+# Much of adb is duplicated in bootable/recovery/minadb and fastboot. Changes
+# made to adb rarely get ported to the other two, so the trees have diverged a
+# bit. We'd like to stop this because it is a maintenance nightmare, but the
+# divergence makes this difficult to do all at once. For now, we will start
+# small by moving common files into a static library. Hopefully some day we can
+# get enough of adb in here that we no longer need minadb. https://b/17626262
+LIBADB_SRC_FILES := \
+    adb.cpp \
+    adb_auth.cpp \
+    adb_io.cpp \
+    adb_listeners.cpp \
+    adb_trace.cpp \
+    adb_utils.cpp \
+    fdevent.cpp \
+    sockets.cpp \
+    transport.cpp \
+    transport_local.cpp \
+    transport_usb.cpp \
+
+LIBADB_CFLAGS := \
+    $(ADB_COMMON_CFLAGS) \
+    -fvisibility=hidden \
+
+LIBADB_linux_CFLAGS := \
+    $(ADB_COMMON_linux_CFLAGS) \
+
+LIBADB_linux_SRC_FILES := \
+    get_my_path_linux.cpp \
+    sysdeps_unix.cpp \
+    usb_linux.cpp \
+
+LOCAL_LIBADB_CFLAGS := $(LIBADB_CFLAGS) -DADB_HOST=1
+
+CPPFLAGS := $(LOCAL_LIBADB_CFLAGS)
+
+LIBADB_SRCS = \
+    $(LIBADB_SRC_FILES) \
+    adb_auth_host.cpp \
+
+LIBADB_OBJS := $(LIBADB_SRCS:.cpp=.o)
+
+libadb: $(LIBADB_OBJS)
+	$(AR) -crv lib$@.a LIBADB_OBJS
 
 
-SRCS+= adb.c
-SRCS+= fdevent.c
-SRCS+= adb_client.c
-SRCS+= commandline.c
-SRCS+= console.c
-SRCS+= file_sync_client.c
-SRCS+= get_my_path_linux.c
-SRCS+= services.c
-SRCS+= sockets.c
-SRCS+= transport.c
-SRCS+= transport_local.c
-SRCS+= transport_usb.c
-SRCS+= usb_linux.c
-SRCS+= usb_vendors.c
-SRCS+= adb_auth_host.c
- 
-VPATH+= ../libcutils
-SRCS+= list.c
-SRCS+= socket_inaddr_any_server.c
-SRCS+= socket_local_client.c
-SRCS+= socket_local_server.c
-SRCS+= socket_loopback_client.c
-SRCS+= socket_loopback_server.c
-SRCS+= socket_network_client.c
-SRCS+= load_file.c
- 
-VPATH+= ../libzipfile
-SRCS+= centraldir.c
-SRCS+= zipfile.c
- 
-VPATH+= ../../../external/zlib/src
-SRCS+= adler32.c
-SRCS+= compress.c
-SRCS+= crc32.c
-SRCS+= deflate.c
-SRCS+= infback.c
-SRCS+= inffast.c
-SRCS+= inflate.c
-SRCS+= inftrees.c
-SRCS+= trees.c
-SRCS+= uncompr.c
-SRCS+= zutil.c
+LOCAL_LDLIBS_linux := -lrt -ldl -lpthread
 
-CPPFLAGS+= -DADB_HOST=1
+LOCAL_SRC_FILES += \
+    adb_client.cpp \
+    bugreport.cpp \
+    client/main.cpp \
+    console.cpp \
+    commandline.cpp \
+    file_sync_client.cpp \
+    line_printer.cpp \
+    services.cpp \
+    shell_service_protocol.cpp \
+
+SRCS = \
+    $(LOCAL_SRC_FILES) \
+
+LOCAL_CFLAGS += \
+    $(ADB_COMMON_CFLAGS) \
+    -D_GNU_SOURCE \
+    -DADB_HOST=1 \
+
+LOCAL_CFLAGS_linux := \
+    $(ADB_COMMON_linux_CFLAGS) \
+
+CPPFLAGS+= $(LOCAL_CFLAGS)
 CPPFLAGS+= -DHAVE_FORKEXEC=1
 CPPFLAGS+= -DHAVE_SYMLINKS
 CPPFLAGS+= -DHAVE_TERMIO_H
@@ -66,9 +111,10 @@ CPPFLAGS+= -I../../../external/openssl/include
 CPPFLAGS+= -I../base/include 
 CFLAGS+= -O2 -g -Wall -Wno-unused-parameter
 
-LIBS= -lcrypto -lpthread -lrt 
+LIBS= $(LOCAL_LDLIBS_linux)
  
-OBJS= $(SRCS:.c=.o)
+OBJS := $(SRCS:.c=.o)
+OBJS += $(SRCS:.cpp=.o)
  
 all: adb
  
