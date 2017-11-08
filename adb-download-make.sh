@@ -18,15 +18,7 @@ cd android-adb
 mkdir system
 cd system
 git clone -b adb_on_arm https://github.com/hanpfei/android_system_core core
-#git clone -b $branch https://android.googlesource.com/platform/system/extras
 cd ..
-#mkdir external
-#cd external
-#git clone -b $branch https://android.googlesource.com/platform/external/zlib
-#git clone -b $branch https://android.googlesource.com/platform/external/openssl
-#git clone -b $branch https://android.googlesource.com/platform/external/libselinux
-#cd ..
-
 
 # MAKE
 # -------------------------
