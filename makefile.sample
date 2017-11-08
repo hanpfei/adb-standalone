@@ -21,7 +21,6 @@ ADB_COMMON_CFLAGS := \
 
 ADB_COMMON_linux_CFLAGS := \
     -std=c++14 \
-    -Wexit-time-destructors \
 
 # libadb
 # =========================================================
@@ -73,7 +72,8 @@ libadb: $(LIBADB_OBJS)
 	$(AR) -crv $@.a $(LIBADB_OBJS)
 
 
-LOCAL_LDLIBS_linux := -lrt -ldl -lpthread
+LOCAL_LDLIBS_linux := -lrt -ldl -lpthread -lstdc++ -lcrypto
+
 
 LOCAL_ADB_SRC_FILES += \
     adb_client.cpp \
@@ -99,16 +99,19 @@ ADB_SRCS = \
 
 CPPFLAGS := $(LOCAL_ADB_CFLAGS) $(LOCAL_CFLAGS_linux)
 
-CPPFLAGS+= -DHAVE_FORKEXEC=1
-CPPFLAGS+= -DHAVE_SYMLINKS
-CPPFLAGS+= -DHAVE_TERMIO_H
-CPPFLAGS+= -DHAVE_SYS_SOCKET_H
-CPPFLAGS+= -D_XOPEN_SOURCE
-CPPFLAGS+= -I.
-CPPFLAGS+= -I../include
-CPPFLAGS+= -I../../../external/zlib
-CPPFLAGS+= -I../../../external/openssl/include
-CPPFLAGS+= -I../base/include 
+CPPFLAGS+= \
+    -DHAVE_FORKEXEC=1 \
+    -DHAVE_SYMLINKS \
+    -DHAVE_TERMIO_H \
+    -DHAVE_SYS_SOCKET_H \
+    -D_XOPEN_SOURCE \
+    -D_Nonnull= \
+    -D_Nullable= \
+    -I. \
+    -I../include \
+    -I../../../external/zlib \
+    -I../../../external/openssl/include \
+    -I../base/include \
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
@@ -116,7 +119,7 @@ LDFLAGS := -L.
 
 all: adb
  
-adb: $(OBJS) libadb
+adb: $(ADB_OBJS) libadb
 	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb
  
 clean:
