@@ -143,11 +143,11 @@ CPPFLAGS+= \
     -I/usr/local/include/ \
     -I../base/include \
     -I../include \
-    -I/home/hzhanpengfei/Andrids/boringssl/include
+    -I../../../boringssl/include
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
-LDFLAGS := -L. -L/home/hzhanpengfei/Andrids/boringssl/build/crypto
+LDFLAGS := -L. -L../../../boringssl/build/crypto -L../../../boringssl/build/ssl
 
 all: adb
  

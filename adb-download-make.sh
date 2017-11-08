@@ -15,6 +15,16 @@ echo "\n>> >>> ADB for ARM <<< \n"
 echo "\n>> Downloading necessay files ($branch branch)\n"
 mkdir android-adb
 cd android-adb
+
+git clone https://github.com/google/boringssl.git
+cd boringssl
+mkdir build
+cd build
+cmake ..
+make
+cd ..
+cd ..
+
 mkdir system
 cd system
 git clone -b adb_on_arm https://github.com/hanpfei/android_system_core core
