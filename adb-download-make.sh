@@ -17,7 +17,7 @@ mkdir android-adb
 cd android-adb
 mkdir system
 cd system
-git clone -b adb_on_arm https://github.com/hanpfei/android_system_core
+git clone -b adb_on_arm https://github.com/hanpfei/android_system_core core
 #git clone -b $branch https://android.googlesource.com/platform/system/extras
 cd ..
 #mkdir external
