@@ -149,10 +149,22 @@ ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
 LDFLAGS := -L. -L../../../boringssl/build/crypto -L../../../boringssl/build/ssl
 
+LOCAL_LDLIBS_linux += -ladb -lbase -llog -lcrypto -lssl
+
+HARDWARE_PLATFORM := $(shell uname -i)
+
+ifeq (x86_64,$(HARDWARE_PLATFORM))
+    LOCAL_LDLIBS_linux += -lm
+endif
+
+ifeq (x86,$(HARDWARE_PLATFORM))
+    LOCAL_LDLIBS_linux += -lm
+endif
+
 all: adb
  
 adb: $(ADB_OBJS) libadb libbase
-	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux) -ladb -lbase -llog -lcrypto -lssl
+	$(LD) -o $@ $(LDFLAGS) $(ADB_OBJS) $(LOCAL_LDLIBS_linux)
  
 clean:
 	rm -rf $(ADB_OBJS) $(LIBADB_OBJS) $(LIBBASE_OBJS) adb libadb.a libbase.a
