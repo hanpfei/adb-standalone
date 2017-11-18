@@ -15,12 +15,11 @@ LIBLOG_SRC_FILES := \
     $(LIBLOG_PATH)/config_write.c \
     $(LIBLOG_PATH)/logger_name.c \
     $(LIBLOG_PATH)/logger_lock.c \
+    $(LIBLOG_PATH)/../libcrypto_utils/android_pubkey.c \
     $(LIBLOG_PATH)/../libcutils/socket_local_client_unix.c \
     $(LIBLOG_PATH)/../libcutils/socket_network_client_unix.c \
     $(LIBLOG_PATH)/../libcutils/socket_local_server_unix.c \
-    $(LIBLOG_PATH)/../libcutils/socket_loopback_server_unix.c \
     $(LIBLOG_PATH)/../libcutils/socket_inaddr_any_server_unix.c \
-    $(LIBLOG_PATH)/../libcutils/socket_loopback_client_unix.c \
     $(LIBLOG_PATH)/../libcutils/load_file.c \
     $(LIBLOG_PATH)/../libcutils/threads.c \
 
@@ -28,7 +27,7 @@ LIBLOG_SRC_FILES += \
     $(LIBLOG_PATH)/fake_log_device.c \
     $(LIBLOG_PATH)/fake_writer.c
 
-LOCAL_SRC_FILES_linux := event_tag_map.c
+#LOCAL_SRC_FILES_linux := event_tag_map.c
 
 LIBLOG_SRCS := $(LIBLOG_SRC_FILES) \
     $(LOCAL_SRC_FILES_linux)
@@ -42,6 +41,8 @@ CFLAGS := -DFAKE_LOG_DEVICE=1 -Werror -fvisibility=hidden $(liblog_cflags) \
     -I../../../external/zlib \
     -I../../../external/openssl/include \
     -I../base/include \
+    -I../libcrypto_utils/include \
+    -I../../../boringssl/include \
 
 LIBLOG_OBJS := $(LIBLOG_SRCS:.c=.o)
 

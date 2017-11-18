@@ -20,6 +20,7 @@ LIBBASE_SRC_FILES := \
     $(LIBBASE_PATH)/stringprintf.cpp \
     $(LIBBASE_PATH)/strings.cpp \
     $(LIBBASE_PATH)/test_utils.cpp \
+    $(LIBBASE_PATH)/../libcutils/sockets.cpp \
 
 libbase_linux_src_files := \
     $(LIBBASE_PATH)/errors_unix.cpp \
@@ -48,10 +49,13 @@ ADB_COMMON_CFLAGS := \
     -Wno-unused-parameter \
     -Wno-missing-field-initializers \
     -Wvla \
-    -DADB_REVISION='"$(adb_version)"' \
+    -DADB_VERSION="\"$(tool_version)\"" \
+
+ADB_COMMON_posix_CFLAGS := \
 
 ADB_COMMON_linux_CFLAGS := \
-    -std=c++14 \
+    $(ADB_COMMON_posix_CFLAGS) \
+    -std=c++14
 
 # libadb
 # =========================================================
@@ -64,17 +68,17 @@ ADB_COMMON_linux_CFLAGS := \
 # get enough of adb in here that we no longer need minadb. https://b/17626262
 LIBADB_SRC_FILES := \
     adb.cpp \
-    adb_auth.cpp \
     adb_io.cpp \
     adb_listeners.cpp \
     adb_trace.cpp \
     adb_utils.cpp \
     fdevent.cpp \
     sockets.cpp \
+    socket_spec.cpp \
+    sysdeps/errno.cpp \
     transport.cpp \
     transport_local.cpp \
     transport_usb.cpp \
-    diagnose_usb.cpp \
 
 LIBADB_CFLAGS := \
     $(ADB_COMMON_CFLAGS) \
@@ -84,19 +88,23 @@ LIBADB_linux_CFLAGS := \
     $(ADB_COMMON_linux_CFLAGS) \
 
 LIBADB_linux_SRC_FILES := \
-    get_my_path_linux.cpp \
     sysdeps_unix.cpp \
-    usb_linux.cpp \
+    sysdeps/posix/network.cpp \
+    client/usb_dispatch.cpp \
+    client/usb_libusb.cpp \
+    client/usb_linux.cpp \
 
 LOCAL_LIBADB_CFLAGS := $(LIBADB_CFLAGS) -DADB_HOST=1
 
 CPPFLAGS := $(LOCAL_LIBADB_CFLAGS) \
-    $(ADB_COMMON_linux_CFLAGS)
+    $(ADB_COMMON_linux_CFLAGS) \
+    -I../libcrypto_utils/include/
 
 LIBADB_SRCS = \
     $(LIBADB_SRC_FILES) \
     $(LIBADB_linux_SRC_FILES) \
     adb_auth_host.cpp \
+    transport_mdns.cpp \
 
 LIBADB_OBJS := $(LIBADB_SRCS:.cpp=.o)
 
@@ -143,13 +151,17 @@ CPPFLAGS+= \
     -I/usr/local/include/ \
     -I../base/include \
     -I../include \
-    -I../../../boringssl/include
+    -I../libcrypto_utils/include \
+    -I../../../boringssl/include \
+    -I../../../external/libusb \
+    -I../../../external/mdnsresponder/mDNSShared/
+
 
 ADB_OBJS += $(LOCAL_ADB_SRC_FILES:.cpp=.o)
 
 LDFLAGS := -L. -L../../../boringssl/build/crypto -L../../../boringssl/build/ssl
 
-LOCAL_LDLIBS_linux += -ladb -lbase -llog -lcrypto -lssl
+LOCAL_LDLIBS_linux += -ladb -lbase -llog -lcrypto -lssl -lusb -ludev -lMDNSSD
 
 HARDWARE_PLATFORM := $(shell uname -i)
 

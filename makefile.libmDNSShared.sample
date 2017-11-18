@@ -1,0 +1,32 @@
+TOOLCHAIN=
+CC= $(TOOLCHAIN)gcc
+LD= $(TOOLCHAIN)gcc
+AR= $(TOOLCHAIN)ar
+CXX=$(TOOLCHAIN)g++
+
+LOCAL_PATH:= $(shell pwd)
+
+LIBMDNSSD_PATH := $(LOCAL_PATH)
+
+LIBMDNSSD_SRC_FILES := \
+    $(LIBMDNSSD_PATH)/dnssd_clientlib.c \
+    $(LIBMDNSSD_PATH)/dnssd_clientstub.c \
+    $(LIBMDNSSD_PATH)/dnssd_ipc.c \
+ 
+LIBMDNSSD_SRCS := $(LIBMDNSSD_SRC_FILES) \
+
+libMDNSSD_cflags := -Wall \
+        -Wno-error=sign-compare \
+        -Wno-error=switch \
+
+CFLAGS := $(libMDNSSD_cflags) \
+    -I. \
+    -DNOT_HAVE_SA_LEN \
+
+LIBMDNSSD_OBJS := $(LIBMDNSSD_SRCS:.c=.o)
+
+libMDNSSD: $(LIBMDNSSD_OBJS)
+	$(AR) -crv ../../../system/core/adb/$@.a $(LIBMDNSSD_OBJS)
+
+clean:
+	rm -rf $(LIBMDNSSD_OBJS) libMDNSSD.a

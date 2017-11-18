@@ -2,7 +2,7 @@
 # -------------------------
 
 # Branch to checkout from Android source code repo
-branch=android-7.1.1_r22
+branch=master
 
 # Makefile to use (will be automatically copied into system/core/adb)
 makefile=makefile.sample
@@ -27,8 +27,26 @@ cd ..
 
 mkdir system
 cd system
-git clone -b adb_on_arm https://github.com/hanpfei/android_system_core core
+git clone -b master https://github.com/hanpfei/android_system_core core
 cd ..
+
+mkdir external
+cd external
+git clone -b $branch https://android.googlesource.com/platform/external/libusb
+cd libusb
+./autogen.sh
+./configure
+make
+
+cp libusb/.libs/libusb-1.0.a ../../system/core/adb/libusb.a
+
+cd ..
+git clone -b $branch https://android.googlesource.com/platform/external/mdnsresponder
+cp ../../makefile.libmDNSShared.sample mdnsresponder/mDNSShared/makefile
+cd mdnsresponder/mDNSShared
+make
+
+cd ../../../
 
 # MAKE
 # -------------------------
