@@ -2,7 +2,7 @@
 # -------------------------
 
 # Branch to checkout from Android source code repo
-branch=master
+branch=android-8.0.0_r34
 
 # Makefile to use (will be automatically copied into system/core/adb)
 makefile=makefile.sample

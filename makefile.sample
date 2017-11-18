@@ -72,6 +72,7 @@ LIBADB_SRC_FILES := \
     adb_listeners.cpp \
     adb_trace.cpp \
     adb_utils.cpp \
+    diagnose_usb.cpp \
     fdevent.cpp \
     sockets.cpp \
     socket_spec.cpp \

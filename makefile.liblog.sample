@@ -16,12 +16,6 @@ LIBLOG_SRC_FILES := \
     $(LIBLOG_PATH)/logger_name.c \
     $(LIBLOG_PATH)/logger_lock.c \
     $(LIBLOG_PATH)/../libcrypto_utils/android_pubkey.c \
-    $(LIBLOG_PATH)/../libcutils/socket_local_client_unix.c \
-    $(LIBLOG_PATH)/../libcutils/socket_network_client_unix.c \
-    $(LIBLOG_PATH)/../libcutils/socket_local_server_unix.c \
-    $(LIBLOG_PATH)/../libcutils/socket_inaddr_any_server_unix.c \
-    $(LIBLOG_PATH)/../libcutils/load_file.c \
-    $(LIBLOG_PATH)/../libcutils/threads.c \
 
 LIBLOG_SRC_FILES += \
     $(LIBLOG_PATH)/fake_log_device.c \
