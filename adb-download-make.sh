@@ -8,6 +8,7 @@ branch=android-8.0.0_r34
 makefile=makefile.sample
 liblogmakefile=makefile.liblog.sample
 
+BUILD_ARCH=$(uname -m)
 
 # DOWNLOAD necessary files
 # -------------------------
@@ -32,10 +33,19 @@ cd ..
 
 mkdir external
 cd external
-git clone -b master https://github.com/hanpfei/libusb.git
-cd libusb
-./configure
-make
+
+if [ $BUILD_ARCH == "x86_64"  -o $BUILD_ARCH == "x86"  ]; then
+  git clone -b $branch https://android.googlesource.com/platform/external/libusb
+  cd libusb
+  ./autogen.sh
+  ./configure
+  make
+elif [ $BUILD_ARCH == "aarch64" ]; then
+  git clone -b master https://github.com/hanpfei/libusb.git
+  cd libusb
+  ./configure
+  make
+fi
 
 cp libusb/.libs/libusb-1.0.a ../../system/core/adb/libusb.a
 
