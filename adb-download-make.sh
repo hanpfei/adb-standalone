@@ -32,9 +32,8 @@ cd ..
 
 mkdir external
 cd external
-git clone -b $branch https://android.googlesource.com/platform/external/libusb
+git clone -b master https://github.com/hanpfei/libusb.git
 cd libusb
-./autogen.sh
 ./configure
 make
 
