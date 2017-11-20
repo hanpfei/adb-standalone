@@ -28,7 +28,7 @@ cd ..
 
 mkdir system
 cd system
-git clone -b master https://github.com/hanpfei/android_system_core core
+git clone -b android-8.0.0_r34 https://github.com/hanpfei/android_system_core core
 cd ..
 
 mkdir external
